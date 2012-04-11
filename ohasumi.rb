@@ -88,7 +88,6 @@ class Ohasumi
                :status => text,
                :in_reply_to_status_id => in_reply_to_status_id,
              }) do |st|
-          p "hogehoge"
           throw :exit
         end
         text = text + "　"
