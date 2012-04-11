@@ -23,4 +23,16 @@ describe User do
     @user.awake.should == 50
   end
 
+  it "寝てないときには寝た時間はnil" do
+    @user.sleep_at.should == nil
+    @user.awake.should == nil
+  end
+
+  it "起きたあとは寝た時間はnil" do
+    @user.sleep
+    @user.awake
+
+    @user.sleep_at.should == nil
+    @user.awake.should == nil
+  end
 end

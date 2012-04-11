@@ -8,6 +8,9 @@ class User
   end
 
   def awake
-    return Time.now - @sleep_at
+    return nil unless @sleep_at
+    secs = Time.now - @sleep_at
+    @sleep_at = nil
+    return secs
   end
 end
