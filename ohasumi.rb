@@ -45,14 +45,20 @@ class Ohasumi
   end
 
   def oyasumi?(status)
-    if status.text == 'おやすみ'
+    if status.text =~ /おやすみ/
+      return true
+    end
+    if status =~ /寝る/
       return true
     end
     return false
   end
 
   def ohayo?(status)
-    if status.text == 'おはよう'
+    if status.text =~ /おはよ[うおー〜]/
+      return true
+    end
+    if status.text =~ /起きた/
       return true
     end
     return false
@@ -61,6 +67,17 @@ class Ohasumi
   def oyasumi(status)
     user_id = status.user.id
     @container.user(user_id).sleep
+
+    screen_name = status.user.screen_name
+    text = sprintf("@%s おやすみなさい ＜●＞＜●＞",screen_name)
+    in_reply_to_status_id = status.id
+
+    post("/1/statuses/update.json",{
+           :status => text,
+           :in_reply_to_status_id => in_reply_to_status_id,
+         }) do |res|
+      # do nothing
+    end
   end
 
   def ohayo(status)
@@ -78,7 +95,7 @@ class Ohasumi
     post("/1/statuses/update.json",{
            :status => text,
            :in_reply_to_status_id => in_reply_to_status_id,
-         }) do |status|
+         }) do |res|
       # do nothing
     end
   end
@@ -105,6 +122,7 @@ class Ohasumi
       end
 
       next unless status.text
+      next unless status.text =~ /@(おはすみ|執事|メイド|ストーカー|ohasumi_bot)/
 
       if ( oyasumi?(status) )
         oyasumi(status)
