@@ -40,7 +40,17 @@ class Ohasumi
         config.public_send(meth_name,v)
       end
     end
-    @container = UserContainer.new
+
+    data_dir_name = case ENV['OHASUMI_ENV']
+                    when 'TEST'
+                      "test"
+                    when 'PROD'
+                      "prod"
+                    else
+                      "dev"
+                    end
+
+    @container = UserContainer.new(File.join(File.dirname(__FILE__), 'data', data_dir_name))
     @client = UserStream.client
   end
 
@@ -48,7 +58,7 @@ class Ohasumi
     if status.text =~ /おやすみ/
       return true
     end
-    if status =~ /寝る/
+    if status.text =~ /寝る/
       return true
     end
     return false
@@ -109,31 +119,40 @@ class Ohasumi
   end
 
   def post(path, params, &block)
-    original_endpoint = @client.endpoint
-    @client.endpoint = "https://api.twitter.com"
-    @client.post(path, params, &block)
-    @client.endpoint = original_endpoint
-  end
-
-  def run
-    @client.user do |status|
-      if ( status.event == "follow" )
-        on_follow(status)
-      end
-
-      next unless status.text
-      next unless status.text =~ /@(おはすみ|執事|メイド|ストーカー|ohasumi_bot)/
-
-      if ( oyasumi?(status) )
-        oyasumi(status)
-      end
-
-      if ( ohayo?(status) )
-        ohayo(status)
-      end
+    begin
+      original_endpoint = @client.endpoint
+      @client.endpoint = "https://api.twitter.com"
+      @client.post(path, params, &block)
+      @client.endpoint = original_endpoint
+    rescue => e
+      $stderr.puts e
     end
   end
 
+  def run
+    begin
+      @client.user do |status|
+        if ( status.event == "follow" )
+          on_follow(status)
+        end
+
+        next unless status.text
+        next unless status.text =~ /@(おはすみ|執事|メイド|ストーカー|ohasumi_bot)/
+
+        if ( oyasumi?(status) )
+          oyasumi(status)
+        end
+
+        if ( ohayo?(status) )
+          ohayo(status)
+        end
+      end
+    end
+  rescue => e
+    raise e
+  ensure
+    @container.dump
+  end
 end
 
 Ohasumi.new(parse_options(ARGV)).run
