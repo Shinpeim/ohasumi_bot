@@ -57,7 +57,7 @@ class Ohasumi
     if status.text =~ /おやすみ/
       return true
     end
-    if status.text =~ /寝る/
+    if status.text =~ /寝(る|ます)/
       return true
     end
     return false
@@ -67,7 +67,7 @@ class Ohasumi
     if status.text =~ /おはよ[うおー〜]/
       return true
     end
-    if status.text =~ /起きた/
+    if status.text =~ /起き(まし)?た/
       return true
     end
     return false
@@ -81,12 +81,19 @@ class Ohasumi
     text = sprintf("@%s おやすみなさい ＜●＞＜●＞",screen_name)
     in_reply_to_status_id = status.id
 
-    post("/1/statuses/update.json",{
-           :status => text,
-           :in_reply_to_status_id => in_reply_to_status_id,
-         }) do |res|
-      # do nothing
-    end
+    #status duplicated対策
+    catch(:exit) {
+      5.times do
+        post("/1/statuses/update.json",{
+               :status => text,
+               :in_reply_to_status_id => in_reply_to_status_id,
+             }) do |st|
+          p "hogehoge"
+          throw :exit
+        end
+        text = text + "　"
+      end
+    }
   end
 
   def ohayo(status)
@@ -118,13 +125,15 @@ class Ohasumi
   end
 
   def post(path, params, &block)
+    raise ArgumentError, "expected a block" unless block_given?
     begin
       original_endpoint = @client.endpoint
       @client.endpoint = "https://api.twitter.com"
       @client.post(path, params, &block)
       @client.endpoint = original_endpoint
+      yield
     rescue => e
-      $stderr.puts e
+      $stderr.puts e.to_s + path + params.to_s
     end
   end
 
