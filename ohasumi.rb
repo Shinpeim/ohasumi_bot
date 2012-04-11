@@ -75,19 +75,35 @@ class Ohasumi
     text = sprintf("@%s %.3f時間寝てましたね ＜●＞＜●＞",screen_name,hours)
     in_reply_to_status_id = status.id
 
-    original_endpoint = @client.endpoint
-    @client.endpoint = "https://api.twitter.com"
-    @client.post("/1/statuses/update.json",{
-                   :status => text,
-                   :in_reply_to_status_id => in_reply_to_status_id,
-                 }) do |status|
+    post("/1/statuses/update.json",{
+           :status => text,
+           :in_reply_to_status_id => in_reply_to_status_id,
+         }) do |status|
       # do nothing
     end
+  end
+
+  def on_follow(status)
+    post("/1/friendships/create.json",{
+           :user_id => status.source.id,
+         }) do |res|
+      # do nothing
+    end
+  end
+
+  def post(path, params, &block)
+    original_endpoint = @client.endpoint
+    @client.endpoint = "https://api.twitter.com"
+    @client.post(path, params, &block)
     @client.endpoint = original_endpoint
   end
 
   def run
     @client.user do |status|
+      if ( status.event == "follow" )
+        on_follow(status)
+      end
+
       next unless status.text
 
       if ( oyasumi?(status) )
