@@ -3,3 +3,4 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rspec'
 require 'timecop'
 require 'user'
+require 'user_container'
