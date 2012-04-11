@@ -1,7 +1,6 @@
 source "http://rubygems.org"
 
 gem "userstream", "~> 1.2.1"
-gem "pit", "~> 0.0.6"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

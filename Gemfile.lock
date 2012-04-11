@@ -4,7 +4,6 @@ GEM
     diff-lcs (1.1.3)
     hashie (1.2.0)
     oauth (0.4.5)
-    pit (0.0.6)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
       rspec-expectations (~> 2.8.0)
@@ -23,7 +22,6 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.0.0)
-  pit (~> 0.0.6)
   rspec (~> 2.8.0)
   timecop (~> 0.3.5)
   userstream (~> 1.2.1)

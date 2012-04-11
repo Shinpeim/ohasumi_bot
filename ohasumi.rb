@@ -2,7 +2,6 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require "optparse"
 require 'user_stream'
-require 'pit'
 require 'user_container'
 require 'user'
 
