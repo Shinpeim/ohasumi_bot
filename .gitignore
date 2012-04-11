@@ -1,0 +1,8 @@
+# bundler
+.bundle
+vendor/bundler
+
+.DS_Store
+
+\#*
+.\#*
