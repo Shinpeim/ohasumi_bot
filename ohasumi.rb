@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require "optparse"
+require 'oauth'
 require 'user_stream'
 require 'user_container'
 require 'user'
@@ -19,7 +20,7 @@ def parse_options(argv)
   options.each do |k,option|
     opts.on(option){|v| config[k] = v}
   end
-  opts.parse!(argv);
+  opts.parse!(argv)
 
   options.each do |k,option|
     if (config[k] == nil)
@@ -48,9 +49,10 @@ class Ohasumi
                     else
                       "dev"
                     end
-
     @container = UserContainer.new(File.join(File.dirname(__FILE__), 'data', data_dir_name))
-    @client = UserStream.client
+
+    consumer = OAuth::Consumer.new(options[:consumer_key], options[:consumer_secret], :site => "https://api.twitter.com/")
+    @access_token = OAuth::AccessToken.new(consumer, options[:oauth_token], options[:oauth_token_secret])
   end
 
   def oyasumi?(status)
@@ -125,20 +127,29 @@ class Ohasumi
 
   def post(path, params, &block)
     raise ArgumentError, "expected a block" unless block_given?
+
+    token = @access_token
+    http = token.consumer.http
+    request = token.consumer.create_signed_request(:post, path, token, {}, params, {'User-Agent' => 'ohasumi_bot'})
+
+    #todo エラー制御マシにする
     begin
-      original_endpoint = @client.endpoint
-      @client.endpoint = "https://api.twitter.com"
-      @client.post(path, params, &block)
-      @client.endpoint = original_endpoint
-      yield
+      http.request(request) do |response|
+        code = response.code.to_i
+        unless code == 200
+          raise StandardError.new response.to_s
+        end
+        yield response
+      end
     rescue => e
-      $stderr.puts e.to_s + path + params.to_s
+      $stderr.puts e
     end
   end
 
   def run
+    client = UserStream.client
     begin
-      @client.user do |status|
+      client.user do |status|
         if ( status.event == "follow" )
           on_follow(status)
         end

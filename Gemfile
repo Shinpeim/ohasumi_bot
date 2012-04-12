@@ -1,5 +1,6 @@
 source "http://rubygems.org"
 
+gem "oauth", "~> 0.4.5"
 gem "userstream", "~> 1.2.1"
 
 # Add dependencies to develop your gem here.
