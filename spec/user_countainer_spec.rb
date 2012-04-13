@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-describe UserContainer do
+describe Ohasumi::UserContainer do
   before do
     @data_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", 'data', 'test'))
-    @c = UserContainer.new(@data_dir)
+    @c = Ohasumi::UserContainer.new(@data_dir)
   end
 
   it "存在しないユーザgetしたら勝手に作る" do
-    @c.user(1).should be_a User
+    @c.user(1).should be_a Ohasumi::User
   end
 
   it "存在してたらそいつを返す" do
@@ -17,7 +17,7 @@ describe UserContainer do
 
   it "たくさん作れる" do
     [*1..10].each do |i|
-      @c.user(i).should be_a User
+      @c.user(i).should be_a Ohasumi::User
       @c.user(i).should equal @c.user(i)
     end
   end
@@ -33,7 +33,7 @@ describe UserContainer do
     @c.dump
     @c = nil;
 
-    @c = UserContainer.new(@data_dir)
+    @c = Ohasumi::UserContainer.new(@data_dir)
     @c.user(1).sleep_at.should == now
     @c.user(2).sleep_at.should == now + 20
   end

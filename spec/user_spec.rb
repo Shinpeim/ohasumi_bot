@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-describe User do
+describe Ohasumi::User do
   before do
-    @user = User.new()
+    @user = Ohasumi::User.new()
   end
 
   it "寝た時間を保持できる" do

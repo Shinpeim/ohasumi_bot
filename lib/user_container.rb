@@ -1,23 +1,25 @@
-class UserContainer
+module Ohasumi
+  class UserContainer
   def initialize(data_dir)
-    @path = data_dir + '/user_container_users.marshal'
-    @users = {}
-    if (File.file?(@path))
-      @users = Marshal.load(IO.read(@path))
-    end
-  end
-
-  def user(user_id)
-    unless @users[user_id]
-      @users[user_id] = User.new
+      @path = data_dir + '/user_container_users.marshal'
+      @users = {}
+      if (File.file?(@path))
+        @users = Marshal.load(IO.read(@path))
+      end
     end
 
-    @users[user_id]
-  end
+    def user(user_id)
+      unless @users[user_id]
+        @users[user_id] = User.new
+      end
 
-  def dump
-    File.open(@path, "w") do |f|
-      f.puts Marshal.dump(@users)
+      @users[user_id]
+    end
+
+    def dump
+      File.open(@path, "w") do |f|
+        f.puts Marshal.dump(@users)
+      end
     end
   end
 end
