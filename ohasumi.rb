@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require "optparse"
-require 'oauth'
-require 'user_stream'
-require 'user_container'
-require 'user'
-require 'bot'
+require 'ohasumi'
 
 def parse_options(argv)
   options = {

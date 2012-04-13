@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require 'oauth'
+require 'userstream'
 module Ohasumi
   class Bot
     def initialize(options)
