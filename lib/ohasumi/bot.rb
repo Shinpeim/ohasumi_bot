@@ -19,7 +19,7 @@ module Ohasumi
                       else
                         "dev"
                       end
-      @container = UserContainer.new(File.join(File.dirname(__FILE__), 'data', data_dir_name))
+      @container = UserContainer.new(File.join(File.dirname(__FILE__), '..', '..', 'data', data_dir_name))
 
       consumer = OAuth::Consumer.new(options[:consumer_key], options[:consumer_secret], :site => "https://api.twitter.com/")
       @access_token = OAuth::AccessToken.new(consumer, options[:oauth_token], options[:oauth_token_secret])
@@ -102,17 +102,16 @@ module Ohasumi
       http = token.consumer.http
       request = token.consumer.create_signed_request(:post, path, token, {}, params, {'User-Agent' => 'ohasumi_bot'})
 
-      #todo エラー制御マシにする
       begin
         http.request(request) do |response|
           code = response.code.to_i
           unless code == 200
-            raise StandardError.new response.to_s
+            raise PostError.new "ohasumi post error", response
           end
           yield response
         end
-      rescue => e
-        $stderr.puts e
+      rescue PostError => e
+        $stderr.puts e.response.to_s
       end
     end
 
